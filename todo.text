@@ -1,0 +1,18 @@
+==> Authentication
+  -> register
+       1.save the data of the user
+       2.give the token to the user
+  -> login
+  -> logout
+
+==> Post
+  -> create
+  -> can see the feed
+  -> like post(collection types)
+  -> save the post
+  
+
+==> user
+  -> followers
+  -> following
+  
