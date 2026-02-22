@@ -1,6 +1,5 @@
-import ImageKit from '@imagekit/nodejs';
-import { toFile } from '@imagekit/nodejs';
-
+const ImageKit = require('@imagekit/nodejs');
+const { toFile } = require('@imagekit/nodejs');
 const jwt = require('jsonwebtoken');
 const postModel = require('../model/post.model');
 
@@ -27,7 +26,7 @@ async function creatPostController(req, res) {
     
     try{
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err){
         return res.status(401).json({
             message:'Unauthorized'
@@ -41,17 +40,17 @@ async function creatPostController(req, res) {
         });
     }
 
-    const uploadedFile = await imagekit.files.upload({
+    const uploadFile = await imagekit.files.upload({
         file: await toFile(req.file.buffer, req.file.originalname),
         fileName: req.file.originalname,
         folder:'insta-clone/posts'
     });
 
-    res.status(200).json(uploadedFile);
+    
 
     const post = await postModel.create({
         caption: req.body.caption,
-        imgUrl: uploadedFile.url,
+        imgUrl: uploadFile.url,
         user: decoded.id
     })
 
@@ -64,6 +63,88 @@ async function creatPostController(req, res) {
 
 };
 
+async function getAllPostsController(req, res){ 
+
+    const token = req.cookies.token;
+    if(!token){
+        return res.status(401).json({
+            message:'Token not provided or Unauthorized'
+        })
+
+    }
+
+    let decoded=null;
+
+    try{
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+    }catch (err){
+        return res.status(401).json({
+            message:'Unauthorized'
+        })
+    }
+
+    let userId = decoded.id;
+
+    const posts = await postModel.find({
+        user:userId
+    })
+
+    res.status(200).json({
+        message:'Posts fetched successfully',
+        posts
+    })
+
+}
+
+async function getPostDetailsByIdController(req, res){
+
+    const token = req.cookies.token;
+    if(!token){
+        return res.status(401).json({
+            message:'Token not provided or Unauthorized'
+        })
+
+    }
+
+    let decoded=null;
+    try{
+
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err){
+        return res.status(401).json({
+            message:'Unauthorized'
+        })
+    }
+
+    const userId = decoded.id;
+
+    const post = await postModel.findById(req.params.postId);
+
+    if(!post){
+        return res.status(404).json({
+            message:'Post not found'
+        })
+    }
+
+    const isvalidUser = post.user.toString() === userId;
+
+    if(!isvalidUser){
+        return res.status(403).json({
+            message:'Forbidden Access'
+        })
+    }
+
+    res.status(200).json({
+        message:'Post details fetched successfully',
+        post
+    })
+
+}
+   
+
+
     module.exports = {
-        creatPostController
+        creatPostController,
+        getAllPostsController,
+        getPostDetailsByIdController
     }

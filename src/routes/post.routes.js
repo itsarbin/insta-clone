@@ -6,6 +6,9 @@ const uplod = multer({storage:multer.memoryStorage()});
 
 postRouter.post('/', uplod.single('image'), postController.creatPostController)
 
+postRouter.get('/', postController.getAllPostsController)
+postRouter.get('/details/:postId', postController.getPostDetailsByIdController)
+
 
 
 
