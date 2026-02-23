@@ -13,25 +13,6 @@ const imagekit = new ImageKit({
 
 async function creatPostController(req, res) {
 
-    const token = req.cookies.token;
-    if(!token){
-        return res.status(401).json({
-            message:'Token not povided or Unauthorized'
-        })
-
-
-    }
-
-    let decoded=null;
-    
-    try{
-
-        decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (err){
-        return res.status(401).json({
-            message:'Unauthorized'
-        })
-    }
 
 
     if (!req.file) {
@@ -51,7 +32,7 @@ async function creatPostController(req, res) {
     const post = await postModel.create({
         caption: req.body.caption,
         imgUrl: uploadFile.url,
-        user: decoded.id
+        user: req.user._id
     })
 
     res.status(201).json({
@@ -65,25 +46,9 @@ async function creatPostController(req, res) {
 
 async function getAllPostsController(req, res){ 
 
-    const token = req.cookies.token;
-    if(!token){
-        return res.status(401).json({
-            message:'Token not provided or Unauthorized'
-        })
+ 
 
-    }
-
-    let decoded=null;
-
-    try{
-        decoded = jwt.verify(token, process.env.JWT_SECRET);
-    }catch (err){
-        return res.status(401).json({
-            message:'Unauthorized'
-        })
-    }
-
-    let userId = decoded.id;
+    let userId = req.user._id;
 
     const posts = await postModel.find({
         user:userId
@@ -98,25 +63,9 @@ async function getAllPostsController(req, res){
 
 async function getPostDetailsByIdController(req, res){
 
-    const token = req.cookies.token;
-    if(!token){
-        return res.status(401).json({
-            message:'Token not provided or Unauthorized'
-        })
 
-    }
 
-    let decoded=null;
-    try{
-
-        decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (err){
-        return res.status(401).json({
-            message:'Unauthorized'
-        })
-    }
-
-    const userId = decoded.id;
+    const userId = req.user._id;
 
     const post = await postModel.findById(req.params.postId);
 
