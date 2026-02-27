@@ -8,6 +8,11 @@ const followSchema = new mongoose.Schema({
     followee:{
        type: String,
         required: [true, 'following id is required']
+    },
+    status:{
+        type: String,
+        enum: ['pending', 'accepted', 'rejected'],
+        default: 'pending'
     }
 },
 {

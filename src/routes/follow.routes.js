@@ -5,5 +5,7 @@ const identifyUser = require('../middleware/auth.middleware');
 
 followRouter.post('/:username', identifyUser, followController.followUserController)
 followRouter.post('/unfollow/:username', identifyUser, followController.unfollowUserController)
+followRouter.post('/accept/:username', identifyUser, followController.acceptFollowController)
+followRouter.post('/reject/:username', identifyUser, followController.rejectFollowController)
 
 module.exports = followRouter;

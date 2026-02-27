@@ -1,8 +1,10 @@
 const ImageKit = require('@imagekit/nodejs');
 const { toFile } = require('@imagekit/nodejs');
-const jwt = require('jsonwebtoken');
+
 const postModel = require('../model/post.model');
 const likeModel = require('../model/like.model');
+const followModel = require('../model/follow.model');
+const userModel = require('../model/user.model')
 
 
 
@@ -25,10 +27,10 @@ async function creatPostController(req, res) {
     const uploadFile = await imagekit.files.upload({
         file: await toFile(req.file.buffer, req.file.originalname),
         fileName: req.file.originalname,
-        folder:'insta-clone/posts'
+        folder: 'insta-clone/posts'
     });
 
-    
+
 
     const post = await postModel.create({
         caption: req.body.caption,
@@ -45,49 +47,70 @@ async function creatPostController(req, res) {
 
 };
 
-async function getAllPostsController(req, res){ 
+async function getAllPostsController(req, res) {
 
- 
+
 
     let userId = req.user._id;
 
+
     const posts = await postModel.find({
-        user:userId
+        user: userId
     })
 
     res.status(200).json({
-        message:'Posts fetched successfully',
+        message: 'Posts fetched successfully',
         posts
     })
 
 }
 
-async function getPostDetailsByIdController(req, res){
+async function getPostDetailsByIdController(req, res) {
 
 
 
-    const userId = req.user._id;
+    const viewerId = req.user._id;
+    const viewerName = req.user.username;
 
     const post = await postModel.findById(req.params.postId);
 
-    if(!post){
+    if (!post) {
         return res.status(404).json({
-            message:'Post not found'
+            message: 'Post not found'
         })
     }
 
-    const isvalidUser = post.user.toString() === userId;
 
-    if(!isvalidUser){
-        return res.status(403).json({
-            message:'Forbidden Access'
+    if (post.user.toString() === viewerId.toString()) {
+        return res.status(200).json({
+            message: 'Post details fetched successfully',
+            post
+        })
+    };
+
+    const owner = await userModel.findById(post.user)
+
+    if (!owner.isPrivate) {
+        return res.status(200).json({
+            message: 'Post details fetched successfully',
+            post
         })
     }
 
-    res.status(200).json({
-        message:'Post details fetched successfully',
-        post
+    const isAcceptedFollower = await followModel.findOne({
+        follower: viewerName,
+        followee: owner.username,
+        status: 'accepted'
     })
+
+    if (!isAcceptedFollower) {
+        return res.status(403).json({
+            message: "The account is Private.",
+            post
+        })
+    }
+
+
 
 }
 
@@ -98,10 +121,10 @@ async function likePost(req, res) {
 
     const postExists = await postModel.findById(postId);
 
-    if(!postExists){
+    if (!postExists) {
 
         return res.status(404).json({
-            message:'Post not found'
+            message: 'Post not found'
         })
     }
 
@@ -110,9 +133,9 @@ async function likePost(req, res) {
         username
     })
 
-    if(alreadyLiked){
+    if (alreadyLiked) {
         return res.status(400).json({
-            message:'You have already liked this post'
+            message: 'You have already liked this post'
         })
     }
 
@@ -122,19 +145,90 @@ async function likePost(req, res) {
     })
 
     res.status(200).json({
-        message:'Post liked successfully',
+        message: 'Post liked successfully',
         likeRecord
     })
 
 }
 
 
-   
+async function getAllFolloweePosts(req, res) {
+
+    const viewer = req.user; // logged in user
+    const followee = await userModel.findOne({
+        username: req.params.username
+    });
 
 
-    module.exports = {
-        creatPostController,
-        getAllPostsController,
-        getPostDetailsByIdController,
-        likePost
+    if (!followee) {
+        return res.status(404).json({
+            message: "Followee user not found"
+        });
     }
+
+    if (viewer._id.toString() === followee._id.toString()) {
+
+        const posts = await postModel.find({
+            user: followee._id
+        });
+
+        return res.status(200).json({
+            message: "Posts fetched successfully",
+            posts
+        });
+    }
+
+
+    if (!followee.isPrivate) {
+
+        const posts = await postModel.find({
+            user: followee._id
+        });
+
+        return res.status(200).json({
+            message: "Posts fetched successfully",
+            posts
+        });
+    }
+
+
+    const isAcceptedFollower = await followModel.findOne({
+        follower: viewer.username,
+        followee: followee.username,
+        status: "accepted"
+    });
+
+    if (!isAcceptedFollower) {
+        return res.status(403).json({
+            message: "This account is private"
+        });
+    }
+
+    const posts = await postModel.find({
+        user: followee._id
+    });
+
+    return res.status(200).json({
+        message: "Posts fetched successfully",
+        posts
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+module.exports = {
+    creatPostController,
+    getAllPostsController,
+    getPostDetailsByIdController,
+    likePost,
+    getAllFolloweePosts
+}

@@ -11,6 +11,8 @@ postRouter.post('/', uplod.single('image'), identifyUser, postController.creatPo
 postRouter.get('/', identifyUser, postController.getAllPostsController)
 postRouter.get('/details/:postId', identifyUser, postController.getPostDetailsByIdController)
 postRouter.post('/like/:postId', identifyUser, postController.likePost)
+postRouter.post('/posts/:username', identifyUser,postController.getAllFolloweePosts)
+
 
 
 

@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema({
         type:String,
         default:"https://ik.imagekit.io/flu09zc7k/Tiktok%20Default%20Profile%20Picture%20Sticker%20Sticker.jpg"
 
+    },
+    isPrivate:{
+        type:Boolean,
+        default:false
     }
 })
 
