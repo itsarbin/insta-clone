@@ -1,0 +1,86 @@
+.feed-page{
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    .feed{
+        width: 100%;
+        max-width: 450px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+
+        .posts{
+            width: 100%;
+
+            .post{
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-bottom: 30px;
+
+                
+
+                .user{
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+
+                    .img-wrapper{
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        border-radius: 50%;
+                       border: 3px solid rgba(189, 12, 36, 0);
+                       background: conic-gradient(purple,orange,purple,rgb(233, 42, 42),purple)border-box;
+                    }
+
+                    img{
+                        width: 2.5rem;
+                        aspect-ratio: 1/1;
+                        border-radius: 50%;
+                    }
+                }
+
+                .post-image{
+                    border-radius: 10px;
+                    overflow: hidden;
+                    img{
+                        width: 100%;
+                        aspect-ratio: 4/5;
+                        object-fit: cover;
+                        display: block;
+                    }
+                }
+
+                .icons{
+                    display: flex;
+                    gap: 15px;
+
+                    svg{
+                        width: 1.5rem;
+                        height: 1.5rem;
+                        cursor: pointer;
+                        color: whitesmoke;
+                    }
+
+                    svg.liked{
+                        stroke:red;
+                        color: red;
+                    }
+
+                    button{
+                        border: none;
+                        outline: none;
+                        background-color: transparent;
+                       
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+    }
+}

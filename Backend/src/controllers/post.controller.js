@@ -48,16 +48,21 @@ async function creatPostController(req, res) {
 };
 
 async function getAllPostsController(req, res) {
+   
+    const posts = await Promise.all((await postModel.find({})
+        .populate('user', 'username profileImg')
+        .sort({createdAt: -1}).lean())
+        .map(async post => {
 
+            const isLiked = await likeModel.findOne({
+                postId: post._id,
+                username: req.user.username
+            })
 
-
-    let userId = req.user._id;
-
-
-    const posts = await postModel.find({
-        user: userId
-    })
-
+            post.isLiked = !!isLiked;
+            return post;
+        })
+)
     res.status(200).json({
         message: 'Posts fetched successfully',
         posts
