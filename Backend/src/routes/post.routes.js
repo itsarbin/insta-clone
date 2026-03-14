@@ -6,11 +6,12 @@ const uplod = multer({storage:multer.memoryStorage()});
 const identifyUser = require('../middleware/auth.middleware');
 
 
-postRouter.post('/', uplod.single('image'), identifyUser, postController.creatPostController)
 
+postRouter.post('/', uplod.single('image'), identifyUser, postController.creatPostController)
 postRouter.get('/', identifyUser, postController.getAllPostsController)
 postRouter.get('/details/:postId', identifyUser, postController.getPostDetailsByIdController)
 postRouter.post('/like/:postId', identifyUser, postController.likePost)
+postRouter.post('/unlike/:postId', identifyUser, postController.unlikePost)
 postRouter.post('/posts/:username', identifyUser,postController.getAllFolloweePosts)
 
 

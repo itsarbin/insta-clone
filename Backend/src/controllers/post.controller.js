@@ -15,36 +15,41 @@ const imagekit = new ImageKit({
 });
 
 async function creatPostController(req, res) {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                message: "Image is required"
+            });
+        }
 
+        if (!req.user?._id) {
+            return res.status(401).json({
+                message: "Unauthorized access"
+            });
+        }
 
+        const uploadFile = await imagekit.files.upload({
+            file: await toFile(req.file.buffer, req.file.originalname),
+            fileName: req.file.originalname,
+            folder: 'insta-clone/posts'
+        });
 
-    if (!req.file) {
-        return res.status(400).json({
-            message: "Image is required"
+        const post = await postModel.create({
+            caption: req.body.caption,
+            imgUrl: uploadFile.url,
+            user: req.user._id
+        })
+
+        res.status(201).json({
+            message: 'Post created successfully',
+            post
+        })
+    } catch (error) {
+        console.error("Create post controller error:", error);
+        return res.status(500).json({
+            message: error?.message || "Failed to create post"
         });
     }
-
-    const uploadFile = await imagekit.files.upload({
-        file: await toFile(req.file.buffer, req.file.originalname),
-        fileName: req.file.originalname,
-        folder: 'insta-clone/posts'
-    });
-
-
-
-    const post = await postModel.create({
-        caption: req.body.caption,
-        imgUrl: uploadFile.url,
-        user: req.user._id
-    })
-
-    res.status(201).json({
-        message: 'Post created successfully',
-        post
-    })
-
-
-
 };
 
 async function getAllPostsController(req, res) {
@@ -156,6 +161,32 @@ async function likePost(req, res) {
 
 }
 
+async function unlikePost(req, res) {
+    const postId = req.params.postId;
+    const username = req.user.username;
+
+    const isLiked = await likeModel.findOne({
+        postId,
+        username
+    })
+
+    if (!isLiked) {
+        return res.status(400).json({
+            message: 'You have not liked this post'
+        })
+    }
+
+    await likeModel.deleteOne({
+        postId,
+        username
+    });
+
+    res.status(200).json({
+        message: 'Post unliked successfully'
+    });
+
+}
+
 
 async function getAllFolloweePosts(req, res) {
 
@@ -235,5 +266,6 @@ module.exports = {
     getAllPostsController,
     getPostDetailsByIdController,
     likePost,
+    unlikePost,
     getAllFolloweePosts
 }

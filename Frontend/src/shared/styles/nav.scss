@@ -1,0 +1,17 @@
+.nav{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding:20px;
+    max-width:600px;
+    width: 100%;
+
+    .brand-text{
+        margin: 0;
+        font-family: "Segoe Script", "Brush Script MT", cursive;
+        font-size: 2rem;
+        font-weight: 600;
+        line-height: 1;
+        color: whitesmoke;
+    }
+}

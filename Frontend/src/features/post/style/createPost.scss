@@ -1,0 +1,46 @@
+.create-post-page{
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .form-container{
+        width: 100%;
+        max-width: 600px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+        padding: 2rem;
+    }
+
+    form{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    input{
+        width: 100%;
+        border: none;
+        outline: none;
+        border-radius: 1rem;
+        padding: 1rem;
+        text-align: left;
+    }
+
+    .post-image-label{
+        background-color: whitesmoke;
+        color: #1d1d1d;
+        padding: 0.5rem 1rem;
+        border-radius:1rem;
+        cursor: pointer;
+    }
+
+    button{
+        align-self: stretch;
+        text-align: center;
+    }
+}
